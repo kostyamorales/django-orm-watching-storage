@@ -9,7 +9,7 @@ DATABASES = {
         'HOST': os.environ.get("HOST"),
         'PORT': os.environ.get("PORT"),
         'NAME': os.environ.get("NAME"),
-        'USER': os.environ.get("USER"),
+        'USER': os.environ.get("MY_APP_USER"),
         'PASSWORD': os.environ.get("PASSWORD"),
     }
 }
