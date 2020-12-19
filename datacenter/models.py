@@ -28,28 +28,26 @@ class Visit(models.Model):
             leaved= "leaved at " + str(self.leaved_at) if self.leaved_at else "not leaved"
         )
 
+    def get_duration(self):
+        self.entared_at = timezone.localtime(self.entered_at)
+        if self.leaved_at:
+            self.leaved_at = timezone.localtime(self.leaved_at)
+            self.duration = datetime.timedelta.total_seconds(self.leaved_at - self.entared_at)
+            return self.duration
+        self.now = timezone.localtime()
+        self.duration = datetime.timedelta.total_seconds(self.now - self.entared_at)
+        return self.duration
 
-def get_duration(visit):
-    entared_at = timezone.localtime(visit.entered_at)
-    if visit.leaved_at:
-        leaved_at = timezone.localtime(visit.leaved_at)
-        duration = datetime.timedelta.total_seconds(leaved_at - entared_at)
-        return duration
-    now = timezone.localtime()
-    duration = datetime.timedelta.total_seconds(now - entared_at)
-    return duration
+    def format_duration(self, seconds):
+        self.hours = int(seconds // 3600)
+        self.minutes = int((seconds % 3600) // 60)
+        self.duration = f'{self.hours}ч {self.minutes}мин'
+        return self.duration
 
+    def is_visit_long(self, minutes=60):
+        self.duration = self.get_duration()
+        self.minutes = self.duration // 60
+        if self.minutes > minutes:
+            return True
+        return False
 
-def format_duration(duration_seconds):
-    hours = int(duration_seconds // 3600)
-    minutes = int((duration_seconds % 3600) // 60)
-    duration = f'{hours}ч {minutes}мин'
-    return duration
-
-
-def is_visit_long(visit, minutes=60):
-    duration = get_duration(visit)
-    duration_minutes = duration // 60
-    if duration_minutes > minutes:
-        return True
-    return False
