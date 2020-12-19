@@ -30,12 +30,12 @@ class Visit(models.Model):
 
     def get_duration(self):
         self.entared_at = timezone.localtime(self.entered_at)
-        if self.leaved_at:
-            self.leaved_at = timezone.localtime(self.leaved_at)
-            self.duration = datetime.timedelta.total_seconds(self.leaved_at - self.entared_at)
+        if self.leaved_at is None:
+            self.now = timezone.localtime()
+            self.duration = datetime.timedelta.total_seconds(self.now - self.entared_at)
             return self.duration
-        self.now = timezone.localtime()
-        self.duration = datetime.timedelta.total_seconds(self.now - self.entared_at)
+        self.leaved_at = timezone.localtime(self.leaved_at)
+        self.duration = datetime.timedelta.total_seconds(self.leaved_at - self.entared_at)
         return self.duration
 
     def format_duration(self, seconds):
