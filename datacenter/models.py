@@ -25,28 +25,25 @@ class Visit(models.Model):
         return "{user} entered at {entered} {leaved}".format(
             user=self.passcard.owner_name,
             entered=self.entered_at,
-            leaved= "leaved at " + str(self.leaved_at) if self.leaved_at else "not leaved"
+            leaved="leaved at " + str(self.leaved_at) if self.leaved_at else "not leaved"
         )
 
     def get_duration(self):
-        self.entered_at = timezone.localtime(self.entered_at)
+        entered_at = timezone.localtime(self.entered_at)
+        end_time = timezone.localtime(self.leaved_at)
         if self.leaved_at is None:
-            self.now = timezone.localtime()
-            self.seconds = datetime.timedelta.total_seconds(self.now - self.entered_at)
-            return self.seconds
-        self.leaved_at = timezone.localtime(self.leaved_at)
-        self.seconds = datetime.timedelta.total_seconds(self.leaved_at - self.entered_at)
-        return self.seconds
+            end_time = timezone.localtime()
+        seconds = datetime.timedelta.total_seconds(end_time - entered_at)
+        return seconds
 
-    def format_duration(self, seconds):
-        self.hours = int(seconds // 3600)
-        self.minutes = int((seconds % 3600) // 60)
-        self.duration = f'{self.hours}ч {self.minutes}мин'
-        return self.duration
-
-    def is_visit_long(self, minutes=60):
-        self.seconds = self.get_duration()
-        self.minutes = self.seconds // 60
-        return self.minutes > minutes
+    def is_visit_long(self, mins=60):
+        seconds = self.get_duration()
+        minutes = seconds // 60
+        return minutes > mins
 
 
+def format_duration(seconds):
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    duration = f'{hours}ч {minutes}мин'
+    return duration
